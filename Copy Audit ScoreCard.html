@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Website Copy Audit Scorecard</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #13100e;
+    --off-white: #f5ede3;
+    --red: #e8581a;
+    --red-dark: #c44010;
+    --amber: #f0a500;
+    --muted: #8a7f74;
+    --card-bg: #1c1714;
+    --card-2: #201a16;
+    --border: rgba(245,237,227,0.08);
+    --border-warm: rgba(232,88,26,0.2);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--black);
+    color: var(--off-white);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 0% 0%, rgba(232,88,26,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 100% 100%, rgba(240,165,0,0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 60px 24px 100px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ALERT BANNER */
+  .alert-banner {
+    background: linear-gradient(90deg, var(--red-dark), #a83508);
+    padding: 10px 20px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-align: center;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    animation: pulse-border 2.5s ease-in-out infinite;
+  }
+
+  .alert-dot {
+    width: 6px;
+    height: 6px;
+    background: #ffcc66;
+    border-radius: 50%;
+    animation: blink 1.2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+
+  /* Header */
+  .header {
+    border-bottom: 1px solid var(--border-warm);
+    padding-bottom: 40px;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--amber);
+    border: 1px solid rgba(240,165,0,0.35);
+    padding: 4px 12px;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(52px, 10vw, 88px);
+    line-height: 0.92;
+    letter-spacing: 0.02em;
+    color: var(--off-white);
+    margin-bottom: 16px;
+  }
+
+  h1 span { color: var(--red); }
+
+  .subtitle {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 480px;
+    font-style: italic;
+  }
+
+  /* Loss ticker */
+  .loss-ticker {
+    margin-top: 20px;
+    padding: 14px 18px;
+    background: rgba(232,88,26,0.08);
+    border-left: 3px solid var(--red);
+    font-size: 13px;
+    color: #d4a898;
+    line-height: 1.5;
+  }
+
+  .loss-ticker strong {
+    color: var(--red);
+    font-weight: 500;
+  }
+
+  /* Score dashboard */
+  .score-dashboard {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin-bottom: 48px;
+    background: var(--border-warm);
+    border: 1px solid var(--border-warm);
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+
+  .score-box {
+    background: var(--card-bg);
+    padding: 28px 24px;
+    text-align: center;
+  }
+
+  .score-box:first-child {
+    grid-column: 1 / -1;
+    background: var(--card-2);
+  }
+
+  .score-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px;
+    line-height: 1;
+    transition: all 0.4s ease;
+  }
+
+  .score-label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .grade-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    margin-top: 8px;
+    transition: color 0.4s ease;
+  }
+
+  /* Sections */
+  .section {
+    margin-bottom: 32px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    color: var(--red);
+    letter-spacing: 0.1em;
+    min-width: 28px;
+  }
+
+  .section-title {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    flex: 1;
+  }
+
+  .section-score {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    color: var(--muted);
+    transition: color 0.3s;
+  }
+
+  /* Questions */
+  .question {
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(245,237,227,0.04);
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .question:last-child { border-bottom: none; }
+
+  .q-text {
+    flex: 1;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #c4b5a8;
+    padding-top: 2px;
+  }
+
+  .q-weight {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .toggle-group {
+    display: flex;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+
+  .toggle-btn {
+    width: 40px;
+    height: 32px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 0.05em;
+  }
+
+  .toggle-btn:hover {
+    border-color: var(--off-white);
+    color: var(--off-white);
+  }
+
+  .toggle-btn.yes.active {
+    background: #2a5c2a;
+    border-color: #3a7a3a;
+    color: #8fcf8f;
+  }
+
+  .toggle-btn.no.active {
+    background: rgba(232,88,26,0.18);
+    border-color: var(--red);
+    color: #f5a080;
+  }
+
+  /* "NO" answers flash the row */
+  .question.flagged {
+    background: rgba(232,88,26,0.04);
+    margin: 0 -8px;
+    padding-left: 8px;
+    padding-right: 8px;
+    border-left: 2px solid rgba(232,88,26,0.4);
+  }
+
+  /* Result panel */
+  .result-panel {
+    margin-top: 48px;
+    padding: 36px;
+    border: 1px solid var(--border-warm);
+    background: var(--card-2);
+    display: none;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .result-panel.visible { display: block; }
+
+  .result-grade {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+  }
+
+  .result-message {
+    font-size: 14px;
+    line-height: 1.75;
+    color: #b8a898;
+    margin-bottom: 24px;
+    padding: 16px;
+    background: rgba(0,0,0,0.2);
+    border-left: 3px solid var(--red);
+  }
+
+  .result-fixes {
+    list-style: none;
+    margin-bottom: 28px;
+  }
+
+  .result-fixes li {
+    padding: 11px 0;
+    border-bottom: 1px solid rgba(245,237,227,0.05);
+    font-size: 13px;
+    color: #c8b8aa;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .result-fixes li::before {
+    content: '⚠';
+    color: var(--amber);
+    flex-shrink: 0;
+    margin-top: 1px;
+    font-size: 12px;
+  }
+
+  /* Cost estimator */
+  .cost-block {
+    background: rgba(232,88,26,0.07);
+    border: 1px solid rgba(232,88,26,0.25);
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+
+  .cost-block-label {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 8px;
+  }
+
+  .cost-block-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: var(--off-white);
+    line-height: 1;
+  }
+
+  .cost-block-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .cta-block {
+    background: linear-gradient(135deg, var(--red-dark), #8a2d06);
+    padding: 28px 28px;
+    margin-top: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-block::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+
+  .cta-block p {
+    font-size: 13px;
+    line-height: 1.65;
+    margin-bottom: 12px;
+    color: rgba(255,255,255,0.85);
+  }
+
+  .cta-block strong {
+    display: block;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+
+  .cta-email {
+    display: inline-block;
+    font-size: 11px;
+    color: #ffcc88;
+    letter-spacing: 0.1em;
+    border: 1px solid rgba(255,200,100,0.4);
+    padding: 6px 14px;
+    margin-top: 4px;
+    animation: pulse-border 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-border {
+    0%, 100% { border-color: rgba(255,200,100,0.4); }
+    50% { border-color: rgba(255,200,100,0.9); }
+  }
+
+  /* Reset button */
+  .reset-btn {
+    display: inline-block;
+    margin-top: 28px;
+    padding: 10px 24px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .reset-btn:hover {
+    color: var(--off-white);
+    border-color: var(--off-white);
+  }
+
+  /* Footer */
+  .footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section:nth-child(1) { animation-delay: 0.15s; }
+  .section:nth-child(2) { animation-delay: 0.25s; }
+  .section:nth-child(3) { animation-delay: 0.35s; }
+  .section:nth-child(4) { animation-delay: 0.45s; }
+  .section:nth-child(5) { animation-delay: 0.55s; }
+
+  @media (max-width: 520px) {
+    .score-dashboard { grid-template-columns: 1fr; }
+    .score-box:first-child { grid-column: 1; }
+    .toggle-btn { width: 36px; height: 30px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="alert-banner">
+  <span class="alert-dot"></span>
+  Every day with weak copy = lost leads, lost revenue, lost deals
+  <span class="alert-dot"></span>
+</div>
+
+<div class="container">
+
+  <div class="header">
+    <div class="tag">⚠ Free Diagnostic · Takes 3 Minutes</div>
+    <h1>YOUR COPY<br>IS <span>COSTING</span><br>YOU SALES<br>RIGHT NOW</h1>
+    <p class="subtitle">Answer 15 questions. Find out exactly how much revenue your website copy is leaking — and what to fix first.</p>
+    <div class="loss-ticker">
+      <strong>Most websites lose 68% of visitors in under 10 seconds.</strong> Weak copy is the #1 reason. Score your site below and find out if you're in that group.
+    </div>
+  </div>
+
+  <div class="score-dashboard">
+    <div class="score-box">
+      <div class="score-number" id="totalScore" style="color: #3a3028;">—</div>
+      <div class="score-label">Overall Score / 100</div>
+      <div class="grade-text" id="gradeText" style="color: #3a3028;">Answer below to see your score</div>
+    </div>
+    <div class="score-box">
+      <div class="score-number" id="answeredCount" style="color: var(--muted); font-size: 42px;">0/15</div>
+      <div class="score-label">Questions Answered</div>
+    </div>
+    <div class="score-box">
+      <div class="score-number" id="weakestArea" style="color: var(--muted); font-size: 20px; margin-top: 10px;">—</div>
+      <div class="score-label">Biggest Revenue Leak</div>
+    </div>
+  </div>
+
+  <!-- SECTION 1 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <span class="section-title">Homepage & Hero Copy</span>
+      <span class="section-score" id="score-s1">—</span>
+    </div>
+    <div class="question" data-section="s1" data-points="10">
+      <div>
+        <div class="q-text">Does your headline immediately tell a stranger what you do and who it's for?</div>
+        <div class="q-weight">High impact · 10pts</div>
+      </div>
+      <div class="toggle-group">
+        <button class="toggle-btn yes" onclick="answer(this, 'yes')">YES</button>
+        <button class="toggle-btn no" onclick="answer(this, 'no')">NO</button>
+      </div>
+    </div>
+    <div class="question" data-section="s1" data-points="7">
+      <div>
+        <div class="q-text">Does your hero section include a clear, specific CTA — not just "Learn More" or "Get Started"?</div>
+        <div class="q-weight">Medium impact · 7pts</div>
+      </div>
+      <div class="toggle-group">
+        <button class="toggle-btn yes" onclick="answer(this, 'yes')">YES</button>
+        <button class="toggle-btn no" onclick="answer(this, 'no')">NO</button>
+      </div>
+    </div>
+    <div class="question" data-section="s1" data-points="8">
+      <div>
+        <div class="q-text">Does your above-the-fold copy address the visitor's #1 pain point directly?</div>
+        <div class="q-weight">High impact · 8pts</div>
+      </div>
+      <div class="toggle-group">
+        <button class="toggle-btn yes" onclick="answer(this, 'yes')">YES</button>
+        <button class="toggle-btn no" onclick="answer(this, 'no')">NO</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <span class="section-title">Social Proof & Trust</span>
+      <span class="section-score" id="score-s2">—</span>
+    </div>
+    <div class="question" data-section="s2" data-points="8">
+      <div>
+        <div class="q-text">Do you have at least 3 visible testimonials with real names and specific results?</div>
+        <div class="q-weight">High impact · 8pts</div>
+      </div>
+      <div class="toggle-group">
+        <button class="toggle-btn yes" onclick="answer(this, 'yes')">YES</button>
+        <button class="toggle-btn no" onclick="answer(this, 'no')">NO</button>
+      </div>
+    </div>
+    <div class="question" data-section="s2" data-points="7">
+      <div>
+        <div class="q-text">Do you have a published case study with measurable before/after results?</div>
+        <div class="q-weight">Medium impact · 7pts</div>
+      </div>
+      <div class="toggle-group">
+        <button class="toggle-btn yes" onclick="answer(this, 'yes')">YES</button>
+        <button class="toggle-btn no" onclick="answer(this, 'no')">NO</button>
+      </div>
+    </div>
+    <div class="question" data-section="s2" data-points="5">
+      <div>
+        <div class="q-text">Do you display logos, press mentions, or recognizable client names?</div>
+        <div class="q-weight">Supporting · 5pts</div>
+      </div>
+      <div class="toggle-group">
+        <button class="toggle-btn yes" onclick="answer(this, 'yes')">YES</button>
+        <button class="toggle-btn no" onclick="answer(this, 'no')">NO</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <span class="section-title">Email & Nurture Sequences</span>
+      <span class="section-score" id="score-s3">—</span>
+    </div>
+    <div class="question" data-section="s3" data-points="8">
+      <div>
+        <div class="q-text">Do new signups or leads receive an automated email sequence after opt-in?</div>
+        <div class="q-weight">High impact · 8pts</div>
+      </div>
+      <div class="toggle-group">
+        <button class="toggle-btn yes" onclick="answer(this, 'yes')">YES</button>
+        <button class="toggle-btn no" onclick="answer(this, 'no')">NO</button>
+      </div>
+    </div>
+    <div class="question" data-section="s3" data-points="7">
+      <div>
+        <div class="q-text">Does your welcome email explain your value proposition clearly within the first 3 lines?</div>
+        <div class="q-weight">Medium impact · 7pts</div>
+      </div>
+      <div class="toggle-group">
+        <button class="toggle-btn yes" onclick="answer(this, 'yes')">YES</button>
+        <button class="toggle-btn no" onclick="answer(this, 'no')">NO</button>
+      </div>
+    </div>
+    <div class="question" data-section="s3" data-points="5">
+      <div>
+        <div class="q-text">Do your emails have a single, clear CTA per email — not multiple competing links?</div>
+        <div class="q-weight">Supporting · 5pts</div>
+      </div>
+      <div class="toggle-group">
+        <button class="toggle-btn yes" onclick="answer(this, 'yes')">YES</button>
+        <button class="toggle-btn no" onclick="answer(this, 'no')">NO</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <span class="section-title">SEO & Content Visibility</span>
+      <span class="section-score" id="score-s4">—</span>
+    </div>
+    <div class="question" data-section="s4" data-points="6">
+      <div>
+        <div class="q-text">Do you publish blog content targeting keywords your buyers are actively searching?</div>
+        <div class="q-weight">Medium impact · 6pts</div>
+      </div>
+      <div class="toggle-group">
+        <button class="toggle-btn yes" onclick="answer(this, 'yes')">YES</button>
+        <button class="toggle-btn no" onclick="answer(this, 'no')">NO</button>
+      </div>
+    </div>
+    <div class="question" data-section="s4" data-points="5">
+      <div>
+        <div class="q-text">Do you have dedicated landing pages for specific industries or buyer personas?</div>
+        <div class="q-weight">Supporting · 5pts</div>
+      </div>
+      <div class="toggle-group">
+        <button class="toggle-btn yes" onclick="answer(this, 'yes')">YES</button>
+        <button class="toggle-btn no" onclick="answer(this, 'no')">NO</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <span class="section-title">Objection Handling & Conversion</span>
+      <span class="section-score" id="score-s5">—</span>
+    </div>
+    <div class="question" data-section="s5" data-points="7">
+      <div>
+        <div class="q-text">Does your site directly address the top 2-3 reasons someone might NOT buy from you?</div>
+        <div class="q-weight">Medium impact · 7pts</div>
+      </div>
+      <div class="toggle-group">
+        <button class="toggle-btn yes" onclick="answer(this, 'yes')">YES</button>
+        <button class="toggle-btn no" onclick="answer(this, 'no')">NO</button>
+      </div>
+    </div>
+    <div class="question" data-section="s5" data-points="7">
+      <div>
+        <div class="q-text">Is your pricing or offer page written to reduce friction — not just list features?</div>
+        <div class="q-weight">Medium impact · 7pts</div>
+      </div>
+      <div class="toggle-group">
+        <button class="toggle-btn yes" onclick="answer(this, 'yes')">YES</button>
+        <button class="toggle-btn no" onclick="answer(this, 'no')">NO</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Result Panel -->
+  <div class="result-panel" id="resultPanel">
+    <div class="result-grade" id="resultGrade"></div>
+    <div class="result-message" id="resultMessage"></div>
+
+    <div class="cost-block" id="costBlock">
+      <div class="cost-block-label">⚠ Estimated Monthly Revenue at Risk</div>
+      <div class="cost-block-value" id="costValue">—</div>
+      <div class="cost-block-sub" id="costSub">Based on average conversion loss from copy gaps at your score level</div>
+    </div>
+
+    <ul class="result-fixes" id="resultFixes"></ul>
+
+    <div class="cta-block">
+      <strong>GET YOUR FREE COPY AUDIT</strong>
+      <p>I'll personally review your website and email copy, pinpoint your top 3 revenue leaks, and send you a prioritized fix plan — free, no pitch, no strings.</p>
+      <p style="font-size:12px; color:rgba(255,255,255,0.6);">Most clients see conversion improvements within 2 weeks of implementing the fixes.</p>
+      <div class="cta-email">↩ Reply to this email with "AUDIT" to claim yours</div>
+    </div>
+    <button class="reset-btn" onclick="resetAll()">↺ Re-score your site</button>
+  </div>
+
+  <div class="footer">
+    <span>Website Copy Audit Scorecard</span>
+    <span>Free Resource · Share Freely</span>
+  </div>
+
+</div>
+
+<script>
+  const state = {
+    answers: {},
+    sections: {
+      s1: { label: 'Homepage & Hero', max: 25, score: 0 },
+      s2: { label: 'Social Proof', max: 20, score: 0 },
+      s3: { label: 'Email Sequences', max: 20, score: 0 },
+      s4: { label: 'SEO & Content', max: 11, score: 0 },
+      s5: { label: 'Objection Handling', max: 14, score: 0 },
+    }
+  };
+
+  const totalMax = 90;
+
+  function answer(btn, val) {
+    const group = btn.closest('.toggle-group');
+    group.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('yes','no','active'));
+    btn.classList.add(val, 'active');
+
+    const question = btn.closest('.question');
+    const section = question.dataset.section;
+    const points = parseInt(question.dataset.points);
+    const qIndex = [...document.querySelectorAll('.question')].indexOf(question);
+
+    state.answers[qIndex] = val === 'yes' ? points : 0;
+
+    // Flag row red if NO
+    if (val === 'no') {
+      question.classList.add('flagged');
+    } else {
+      question.classList.remove('flagged');
+    }
+
+    recalculate();
+  }
+
+  function recalculate() {
+    Object.keys(state.sections).forEach(k => state.sections[k].score = 0);
+
+    let total = 0;
+    const questions = document.querySelectorAll('.question');
+    questions.forEach((q, i) => {
+      if (state.answers[i] !== undefined) {
+        const section = q.dataset.section;
+        state.sections[section].score += state.answers[i];
+        total += state.answers[i];
+      }
+    });
+
+    Object.entries(state.sections).forEach(([key, sec]) => {
+      const el = document.getElementById('score-' + key);
+      const sectionQs = [...document.querySelectorAll(`.question[data-section="${key}"]`)];
+      const hasAnswer = sectionQs.some((q) => {
+        const gi = [...document.querySelectorAll('.question')].indexOf(q);
+        return state.answers[gi] !== undefined;
+      });
+      if (hasAnswer) {
+        const pct = Math.round((sec.score / sec.max) * 100);
+        el.textContent = pct + '%';
+        el.style.color = pct >= 70 ? '#6db87a' : pct >= 40 ? '#f0a500' : '#e8581a';
+      }
+    });
+
+    const answered = Object.keys(state.answers).length;
+    const totalQuestions = document.querySelectorAll('.question').length;
+    document.getElementById('answeredCount').textContent = answered + '/' + totalQuestions;
+    document.getElementById('answeredCount').style.color = 'var(--off-white)';
+
+    if (answered > 0) {
+      const scaledScore = Math.round((total / (answered * (totalMax / totalQuestions))) * 100);
+      const cappedScore = Math.min(scaledScore, 100);
+      const scoreEl = document.getElementById('totalScore');
+      scoreEl.textContent = cappedScore;
+
+      let grade, gradeColor;
+      if (cappedScore >= 80)      { grade = 'Solid Foundation'; gradeColor = '#6db87a'; }
+      else if (cappedScore >= 60) { grade = 'Leaking Revenue'; gradeColor = '#f0a500'; }
+      else if (cappedScore >= 40) { grade = 'Serious Gaps — Act Now'; gradeColor = '#e8841a'; }
+      else                        { grade = 'Critical — Losing Sales Daily'; gradeColor = '#e8581a'; }
+
+      scoreEl.style.color = gradeColor;
+      document.getElementById('gradeText').textContent = grade;
+      document.getElementById('gradeText').style.color = gradeColor;
+
+      // Weakest area
+      let weakest = null, weakestPct = 101;
+      Object.entries(state.sections).forEach(([key, sec]) => {
+        const sectionQs = [...document.querySelectorAll(`.question[data-section="${key}"]`)];
+        const hasAnswer = sectionQs.some(q => {
+          const gi = [...document.querySelectorAll('.question')].indexOf(q);
+          return state.answers[gi] !== undefined;
+        });
+        if (hasAnswer) {
+          const pct = (sec.score / sec.max) * 100;
+          if (pct < weakestPct) { weakestPct = pct; weakest = sec.label; }
+        }
+      });
+      if (weakest) {
+        const el = document.getElementById('weakestArea');
+        el.textContent = weakest;
+        el.style.color = '#e8581a';
+        el.style.fontSize = '15px';
+      }
+
+      if (answered === totalQuestions) showResult(cappedScore);
+    }
+  }
+
+  function showResult(score) {
+    const panel = document.getElementById('resultPanel');
+    panel.classList.add('visible');
+
+    let grade, message, fixes, cost, costSub;
+
+    if (score >= 80) {
+      grade = '✦ Score: ' + score + '/100 — Good, But Not Optimal';
+      message = 'Your copy is better than most. But "better than most" still means visitors are leaving money on the table. Even at this score, there are specific friction points costing you 10–20% of potential conversions. A targeted audit will find them fast.';
+      fixes = ['Your headline can likely be sharpened to speak more directly to buyer outcomes', 'Add ROI-specific micro-copy near your primary CTA to reduce last-second hesitation', 'Test a shorter, punchier email nurture sequence — most are too long and lose readers'];
+      cost = '$2,000–$5,000/mo';
+      costSub = 'Estimated revenue left on the table monthly from copy friction at your score';
+    } else if (score >= 60) {
+      grade = '⚠ Score: ' + score + '/100 — Leaking Revenue Right Now';
+      message = 'You have real gaps in at least 2-3 areas. Visitors are arriving, getting confused, and handing their business to a competitor with clearer copy. This is not a traffic problem — it is a copy problem. And it is fixable within days, not months.';
+      fixes = ['Your homepage headline is not speaking directly to your buyer\'s specific pain — this alone is killing conversions', 'Missing or generic social proof is destroying trust before visitors even scroll past the fold', 'Your email sequences are not converting trials to paid — leads are going cold after sign-up', 'Competitors with SEO content are intercepting your buyers before they even reach you'];
+      cost = '$5,000–$12,000/mo';
+      costSub = 'Estimated revenue lost monthly from copy gaps at your score level';
+    } else if (score >= 40) {
+      grade = '✖ Score: ' + score + '/100 — Multiple Revenue Leaks Active';
+      message = 'Your copy has serious gaps working against you right now. Every visitor who lands on your site and bounces is a sale your competitor closes. At this score, weak copy is not just a cosmetic problem — it is actively costing you clients, demos, and revenue every single week.';
+      fixes = ['Homepage hero needs a complete rewrite — visitors cannot tell what you do or why it matters in under 8 seconds', 'No case studies means no trust for cold traffic — this is your single biggest missed opportunity', 'Email nurture is missing or broken — every lead that goes cold is revenue you will never recover', 'No SEO content = invisible to buyers who are actively searching for what you sell right now', 'Your pricing page is listing features, not selling outcomes — it is creating hesitation, not confidence'];
+      cost = '$12,000–$25,000/mo';
+      costSub = 'Estimated monthly revenue loss from copy gaps at this score level';
+    } else {
+      grade = '✖✖ Score: ' + score + '/100 — Copy Is Actively Killing Your Business';
+      message = 'At this score, your website is losing the vast majority of visitors before they ever understand what you offer. Every dollar you spend on ads, outreach, or marketing is being poured into a leaking bucket. The copy must be fixed before anything else will work.';
+      fixes = ['Full homepage overhaul — headline, subhead, CTA, and proof section are all broken', 'You have zero case studies — your competitors\' proof is closing deals you should be winning', 'No email nurture sequence means 90%+ of leads go cold and never come back', 'Buyers searching for you right now are landing on competitor content — you have no SEO presence', 'Your objection page is not handling hesitation — buyers are leaving right before they would have said yes', 'Your offer copy lists features, not transformation — prospects don\'t see why they should pay'];
+      cost = '$25,000–$50,000/mo';
+      costSub = 'Estimated monthly revenue being lost to copy failures at this score level';
+    }
+
+    document.getElementById('resultGrade').textContent = grade;
+    document.getElementById('resultGrade').style.color = score >= 80 ? '#6db87a' : score >= 60 ? '#f0a500' : '#e8581a';
+    document.getElementById('resultMessage').textContent = message;
+    document.getElementById('costValue').textContent = cost;
+    document.getElementById('costSub').textContent = costSub;
+
+    const ul = document.getElementById('resultFixes');
+    ul.innerHTML = fixes.map(f => `<li>${f}</li>`).join('');
+
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function resetAll() {
+    state.answers = {};
+    Object.keys(state.sections).forEach(k => state.sections[k].score = 0);
+    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('yes','no','active'));
+    document.querySelectorAll('.question').forEach(q => q.classList.remove('flagged'));
+    document.getElementById('totalScore').textContent = '—';
+    document.getElementById('totalScore').style.color = '#3a3028';
+    document.getElementById('gradeText').textContent = 'Answer below to see your score';
+    document.getElementById('gradeText').style.color = '#3a3028';
+    document.getElementById('answeredCount').textContent = '0/15';
+    document.getElementById('weakestArea').textContent = '—';
+    ['s1','s2','s3','s4','s5'].forEach(s => {
+      const el = document.getElementById('score-' + s);
+      el.textContent = '—';
+      el.style.color = 'var(--muted)';
+    });
+    document.getElementById('resultPanel').classList.remove('visible');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
